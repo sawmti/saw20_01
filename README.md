@@ -1,6 +1,6 @@
-[![Continuous integration for SAW template](https://github.com/sawmti/saw20_0/actions/workflows/ci.yml/badge.svg)](https://github.com/sawmti/saw20_0/actions/workflows/ci.yml)
+[![Continuous integration for SAW template](https://github.com/sawmti/saw20_01/actions/workflows/ci.yml/badge.svg)](https://github.com/sawmti/saw20_01/actions/workflows/ci.yml)
 
-# Project structure
+# Project structure - SAW_20_01
 
 This repository contains a simple skeleton of a web page which contains a REST service implemented in Node and a simple Web client that invokes the service. 
 
@@ -25,8 +25,8 @@ You should be able to access the application in [http://localhost:3000](http://l
 It is possible to run the application from docker with
 
 ```
-docker build -t "saw200" .
-docker run saw200
+docker build -t "saw2001" .
+docker run saw2001
 ```
 
 or 
