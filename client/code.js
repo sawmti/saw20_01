@@ -4,7 +4,9 @@ async function getEntities() {
     return data
 }
 
-function fillEntities() {
+function fillEntities(codeEntity) {
+    console.log(codeEntity);
+
     getEntities().then(data => {
         console.log(data.entities);
         const ulEntities = document.getElementById("entities");
