@@ -6,6 +6,18 @@
 </head>
 <body>
 <h1>Entities</h1>
-<button type="button" onclick="fillEntities()">See entities</button>
-<ul id="entities" />
+<input type="text" id="entityCode" name="entityCode"/>
+<button type="button" onclick="fillEntities(document.getElementById('entityCode').value)">See entities
+
+</button>
+<BR/>
+<table>
+    <tr>
+        <td title="Header" valign="top"><ul id="entities" /></td>
+        <td valign="top"><ul id="labels" /></td>
+    </tr>
+</table>
+
+
+
 </html>
