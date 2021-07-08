@@ -1,20 +1,19 @@
-async function getEntities() {
-    const response = await fetch('/api/entities');
-    const data = await response.json();
-    return data
-}
+let btnPopulate = document.getElementById('btnPopulate');
+let select = document.getElementById('selectEntity');
 
-function fillEntities(codeEntity) {
-    console.log(codeEntity);
-
+btnPopulate.addEventListener('click', ()=>{
+    let fr = [];
     getEntities().then(data => {
         console.log(data.entities);
-        const ulEntities = document.getElementById("entities");
         data.entities.forEach(entity => {
-          const liEntity = document.createElement("li");
-          const text = document.createTextNode(entity);
-          liEntity.appendChild(text);
-          ulEntities.appendChild(liEntity);
+            fr.push([entity, fr[entity]]);
         })
+        select.innerHTML = fr.map(entity => `<option value="${entity}">${entity}</option>`).join(',');
     })
+});
+
+
+async function getEntities() {
+    const response = await fetch('/api/entities');
+    return await response.json();
 }
