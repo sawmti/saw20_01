@@ -14,12 +14,10 @@ app.use(express.static(root + '/client'));
 
 // PROFESOR: Simple REST API that returns some entities
 app.get('/api/entities/:entityCode', async (req, res) => {
-    console.log(11);
     try {
         var Request = require("request");
         Request.get(`http://www.wikidata.org/entity/${req.params.entityCode}`, (error, response, body) => {
             if (error) {
-                console.log(12);
                 //PENDIENTE MANEJO DE ERRORES CODIFICADOS
                 return console.dir(error);
             }

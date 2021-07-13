@@ -6,13 +6,9 @@ async function getEntities(req) {
 }
 
 function fillEntities(req) {
-    console.log(1);
     getEntities(req).then(data => {
-        console.log(2);
-        //console.log(data.entities);
         const ulEntities = document.getElementById("entities");
         const ulLabels = document.getElementById("labels");
-        console.log(3);
         for(var attributename in data.entities[req]){
             const liEntity = document.createElement("li");
             const text = document.createTextNode(attributename+": "+data.entities[req][attributename]);

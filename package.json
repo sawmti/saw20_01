@@ -7,9 +7,10 @@
     "testEnvironment": "node"
   },
   "scripts": {
+    "start": "node index.js",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "start": "node server.js",
+    "serve": "node server.js",
     "start:watch": "nodemon server.js"
   },
   "keywords": [],
