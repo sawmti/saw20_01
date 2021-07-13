@@ -14,16 +14,19 @@ app.use(express.static(root + '/client'));
 
 // PROFESOR: Simple REST API that returns some entities
 app.get('/api/entities/:entityCode', async (req, res) => {
+    console.log(11);
     try {
         var Request = require("request");
         Request.get(`http://www.wikidata.org/entity/${req.params.entityCode}`, (error, response, body) => {
             if (error) {
+                console.log(12);
                 //PENDIENTE MANEJO DE ERRORES CODIFICADOS
                 return console.dir(error);
             }
             return res.status(200).json(JSON.parse(body));
         });
     } catch (err) {
+        console.log('error desconocido', err);
         const error = {
             msg: 'Error al listar'
         }
@@ -36,7 +39,8 @@ app.get('/api/entities/:entityCode', async (req, res) => {
 /*app.get('/api/entities', (req,res) => 
  res.send({ entities: 
    ['Q2887', 
-    'Q33986789'
+    'Q33986789',
+       'sdfgsdgfsdgf'
    ]})
 );*/
 
