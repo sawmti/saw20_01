@@ -7,13 +7,13 @@ async function getEntities(req) {
 }
 
 function fillEntities(req) {
-   
-    getEntities(req).then(data => {
+   let v = req;
+    getEntities(v).then(data => {
         //console.log(data.entities);
         const ulEntities = document.getElementById("entities");
         const ulLabels = document.getElementById("labels");
         
-        for(var attributename in data.entities[req]){
+        for(var attributename in data.entities[v]){
             const liEntity = document.createElement("li");
             const text = document.createTextNode(attributename+": "+data.entities[req][attributename]);
             liEntity.appendChild(text);
