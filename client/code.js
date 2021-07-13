@@ -1,5 +1,5 @@
 async function getEntities(req) {
-    const response = await fetch(new Request(`./api/entities/${req}`));
+    const response = await fetch(new Request(`/api/entities/${req}`));
     const data = await response.json();
    
     return data;
