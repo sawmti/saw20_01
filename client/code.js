@@ -1,5 +1,5 @@
 async function getEntities(req) {
-    const response = await fetch(new Request(`/api/entities/${req}`));
+    const response = await fetch(new Request(`./api/entities/${req}`));
     const data = await response.json();
    
     return data;
@@ -9,7 +9,9 @@ function fillEntities(req) {
     getEntities(req).then(data => {
         const ulEntities = document.getElementById("entities");
         const ulLabels = document.getElementById("labels");
+        console.log('req: '+req);
         for(var attributename in data.entities[req]){
+            console.log('data 2: '+data.entities[req]);
             const liEntity = document.createElement("li");
             const text = document.createTextNode(attributename+": "+data.entities[req][attributename]);
             liEntity.appendChild(text);
