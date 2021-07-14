@@ -1,10 +1,9 @@
 const express = require('express');
 const path = require('path');
 //const axios = require('axios');
-
-
 const app = express()
 const root = path.resolve(__dirname, '..')
+const db = require('./queries')
 
 // Log invocations
 app.use(function (req, res, next) { console.log(req.url); next(); });
@@ -32,6 +31,8 @@ app.get('/api/entities/:entityCode', async (req, res) => {
         return res.status(500).json(error.msg);
     }
 });
+
+app.get('/api/entities/:entityCode/annotations', db.getAnnotationsByEntityCode)
 
 // PROFESOR: Simple REST API that returns some entities
 /*app.get('/api/entities', (req,res) => 
