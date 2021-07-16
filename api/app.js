@@ -13,10 +13,25 @@ app.use(
   })
 )
 
-// Log invocations
+ /**
+   * Indicates that columns have changed in a table.
+   *
+   * @param {string} type
+   *   Type of change: 'show' or 'hide'.
+   *
+   * @event columnschange
+   */
 app.use(function (req, res, next) { console.log(req.url); next(); });
 
 // Directly serve static content from /client
+ /**
+   * Indicates that columns have changed in a table.
+   *
+   * @param {string} type
+   *   Type of change: 'show' or 'hide'.
+   *
+   * @event columnschange
+   */
 app.use(express.static(root + '/client'));
 
 // 
@@ -42,9 +57,9 @@ app.get('/api/entities/:entityCode', async (req, res) => {
 
 app.get('/api/entities/:entityCode/annotations', db.getAnnotationsByEntityCode)
 
-app.post('/api/entities', db.createAnnotation)
+app.post('/api/entities/annotations', db.createAnnotation)
 
-app.put('/api/entities', db.updateAnnotation)
+app.put('/api/entities/annotations', db.updateAnnotation)
 
 app.delete('/api/entities/:entityCode/annotations/:annotationProperty', db.deleteAnnotation)
 
