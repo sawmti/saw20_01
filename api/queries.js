@@ -28,29 +28,72 @@ const getAnnotationsByEntityCode = (request, response) => {
       if (error) {
         throw error
       }
-      console.log(results.rows);
-      console.log(entityCode);
-      response.status(200).json(results.rows)
-    })
-  }
-
-const getAnnotations = (request, response) => {
-    const entityCode = parseInt(request.params.entityCode)
-  
-    pool.query('SELECT * FROM entityAnnotation', (error, results) => {
-      if (error) {
-        throw error
-      }
-      console.log(results.rows);
+      //console.log(results.rows);
       //console.log(entityCode);
       response.status(200).json(results.rows)
     })
   }
 
+const createAnnotation = (request, response) => {
+  //console.log(request.body);
+  const { annotationProperty, annotationValue, entityCode } = request.body
   
+  pool.query('INSERT INTO entityAnnotation(annotationProperty, annotationValue, entityCode) VALUES ($1, $2, $3)', [annotationProperty, annotationValue, entityCode ], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(201).send(`Annotation created`)
+  })
+}
+
+const updateAnnotation = (request, response) => {
+  const { annotationProperty, annotationValue, entityCode } = request.body
+
+  pool.query(
+    'UPDATE entityAnnotation SET annotationValue = $2 WHERE entityCode = $3 and annotationProperty = $1',
+    [annotationProperty, annotationValue, entityCode],
+    (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).send(`Annotation modified`)
+    }
+  )
+}
+
+const deleteAnnotation = (request, response) => {
+  const annotationProperty  = request.params.annotationProperty;
+  const entityCode  = request.params.entityCode;
+
+  console.log(annotationProperty);
+  console.log(entityCode);
+  
+  pool.query('DELETE FROM entityAnnotation WHERE entityCode = $2 and annotationProperty = $1',
+   [annotationProperty, entityCode], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).send(`Annotation deleted`)
+  })
+}
+
+const getAnnotations = (request, response) => {
+  pool.query('SELECT * FROM entityAnnotation', (error, results) => {
+    if (error) {
+      throw error
+    }
+    console.log(results.rows);
+    //console.log(entityCode);
+    response.status(200).json(results.rows)
+  })
+}
+
 module.exports = {
     getAnnotationsByEntityCode,
     getAnnotations,
+    createAnnotation,
+    updateAnnotation, 
+    deleteAnnotation
 }
 
 

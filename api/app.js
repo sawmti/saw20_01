@@ -1,9 +1,17 @@
 const express = require('express');
+const bodyParser = require('body-parser')
 const path = require('path');
 //const axios = require('axios');
 const app = express()
 const root = path.resolve(__dirname, '..')
 const db = require('./queries')
+
+app.use(bodyParser.json())
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+)
 
 // Log invocations
 app.use(function (req, res, next) { console.log(req.url); next(); });
@@ -11,7 +19,7 @@ app.use(function (req, res, next) { console.log(req.url); next(); });
 // Directly serve static content from /client
 app.use(express.static(root + '/client'));
 
-// PROFESOR: Simple REST API that returns some entities
+// 
 app.get('/api/entities/:entityCode', async (req, res) => {
     try {
         var Request = require("request");
@@ -34,6 +42,12 @@ app.get('/api/entities/:entityCode', async (req, res) => {
 
 app.get('/api/entities/:entityCode/annotations', db.getAnnotationsByEntityCode)
 
+app.post('/api/entities', db.createAnnotation)
+
+app.put('/api/entities', db.updateAnnotation)
+
+app.delete('/api/entities/:entityCode/annotations/:annotationProperty', db.deleteAnnotation)
+
 // PROFESOR: Simple REST API that returns some entities
 /*app.get('/api/entities', (req,res) => 
  res.send({ entities: 
@@ -42,6 +56,7 @@ app.get('/api/entities/:entityCode/annotations', db.getAnnotationsByEntityCode)
        'sdfgsdgfsdgf'
    ]})
 );*/
+
 
 
 module.exports = app
