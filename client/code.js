@@ -1,51 +1,98 @@
 async function getEntities(req) {
-    var myRequest = new Request(`/api/entities/${req}`);
+    let myRequest = new Request(`/api/entities/${req}`);
     const response = await fetch(myRequest);
-    const data = await response.json();
-   
-    return data;
+    return await response.json();
 }
 
 function fillEntities(req) {
-   
+
     getEntities(req).then(data => {
-        //console.log(data.entities);
-        const ulEntities = document.getElementById("entities");
-        const ulLabels = document.getElementById("claims");
-        
-        for(var attributename in data.entities[req]){
-            const liEntity = document.createElement("li");
-            const text = document.createTextNode(attributename+": "+data.entities[req][attributename]);
-            liEntity.appendChild(text);
-            //ulEntities.appendChild(liEntity);
-            document.getElementById('country-code').innerHTML=req;
 
-            if(attributename == 'labels'){
-                const labelsArray =  data.entities[req][attributename]
-                for(let label in labelsArray){
-                    if(label =='es'){
-                        const countryName = labelsArray[label]['value'];
-                        document.getElementById('country-name').innerHTML=countryName;
-                        console.log(countryName);
-                    }
-                }
+        //Obtiene el id del equipo ganador
+        var winnerId = data.entities[req]['claims']['P1346'][0]['mainsnak']['datavalue']['value']['id'];
+        getWinnerTeamName(winnerId);
 
+        //Obtiene la edicion de la copa america
+        var editionId = data.entities[req]['claims']['P393'][0]['mainsnak']['datavalue']['value'];
+        console.log('Edición: ' + editionId);
+        document.getElementById('champ-edition').innerHTML = editionId;
 
-            }
+        //Obtiene el nombre del pais
+        var countryId = data.entities[req]['claims']['P17'][0]['mainsnak']['datavalue']['value']['id'];
+        getHostCountry(countryId);
 
-            if (attributename == 'claims'){
+        //Obtiene el agno
+        var year = data.entities[req]['claims']['P585'][0]['mainsnak']['datavalue']['value']['time'];
+        document.getElementById('champ-year').innerHTML = parseInt(year);
 
-                const claimsArray =  data.entities[req][attributename];
-                for(var claim in claimsArray){
+        //Obtiene goleadores
+        var goleador = data.entities[req]['claims']['P3279'];
+        getGoleador(goleador);
 
-                    console.log(JSON.stringify(claim));
-
-                    const liLabel = document.createElement("li");
-                    const textLabel = document.createTextNode(claim);
-                    liLabel.appendChild(textLabel);
-                    ulLabels.appendChild(liLabel);
-                }
-            }
-        }
+        //Obtiene nombre del evento
+        getEventName(data, req);
     })
+}
+
+function getEventName(data, req) {
+    document.getElementById('country-code').innerHTML = req;
+    //Obtiene el nombre del evento
+    const eventName = data.entities[req]['labels']['es']['value'];
+    document.getElementById('event-name').innerHTML = eventName;
+    console.log('Nombre del evento: ' + eventName);
+}
+
+function getWinnerTeamName(req) {
+    getEntities(req).then(data => {
+        var winnerTeam = data.entities[req]['labels']['es']['value'];
+        console.log('Equipo Ganador: ' + winnerTeam);
+        document.getElementById('winner-team').innerHTML = winnerTeam;
+        window.stop();
+    })
+}
+
+function getHostCountry(req) {
+    getEntities(req).then(data => {
+        var hostCountry = data.entities[req]['labels']['es']['value'];
+        console.log('Pais Anfitrion: ' + hostCountry);
+        document.getElementById('host-country').innerHTML = hostCountry;
+    })
+}
+
+function getGoleador(req) {
+    for (g in req) {
+        var goleadorId = req[g]['mainsnak']['datavalue']['value']['id'];
+        getGoalName(goleadorId);
+    }
+}
+
+/**
+ * Obtiene goleadores
+ * @param req
+ */
+function getGoalName(req) {
+    getEntities(req).then(data => {
+        const ulLabels = document.getElementById("goleadores");
+        var goleador = data.entities[req]['labels']['es']['value']
+        console.log('Goleador: ' + goleador);
+        const liLabel = document.createElement("tr");
+        const textLabel = document.createTextNode(goleador);
+        liLabel.appendChild(textLabel);
+        ulLabels.appendChild(liLabel);
+    })
+
+}
+
+
+function pass(ent, country, year) {
+    console.log(ent, country, year);
+    sessionStorage.setItem("entityCode", ent);
+    sessionStorage.setItem("entityCountry", country);
+    sessionStorage.setItem("entityYear", year);
+}
+
+function loadImage() {
+    var cdg = sessionStorage.getItem("entityCode");
+    var cdgImg = '/images/' + cdg + '.jpg';
+    $("img#Myimg").attr('src', cdgImg);
 }
