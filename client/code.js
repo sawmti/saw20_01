@@ -4,6 +4,10 @@ async function getEntities(req) {
     return await response.json();
 }
 
+/**
+ * Funcion que obtiene las anotaciones selecionadas
+ * @param req
+ */
 function fillEntities(req) {
 
     getEntities(req).then(data => {
@@ -14,7 +18,6 @@ function fillEntities(req) {
 
         //Obtiene la edicion de la copa america
         var editionId = data.entities[req]['claims']['P393'][0]['mainsnak']['datavalue']['value'];
-        console.log('Edición: ' + editionId);
         document.getElementById('champ-edition').innerHTML = editionId;
 
         //Obtiene el nombre del pais
@@ -32,38 +35,77 @@ function fillEntities(req) {
         //Obtiene nombre del evento
         getEventName(data, req);
     })
+    getCustomizedAnnotations(req);
 }
 
+/**
+ * Obtiene el nombre del evento de la copa america
+ * @param data
+ * @param req
+ */
 function getEventName(data, req) {
     document.getElementById('country-code').innerHTML = req;
     //Obtiene el nombre del evento
     const eventName = data.entities[req]['labels']['es']['value'];
     document.getElementById('event-name').innerHTML = eventName;
-    console.log('Nombre del evento: ' + eventName);
 }
 
+/**
+ * Funcion que obtiene al equipo ganador
+ * @param req
+ */
 function getWinnerTeamName(req) {
     getEntities(req).then(data => {
         var winnerTeam = data.entities[req]['labels']['es']['value'];
-        console.log('Equipo Ganador: ' + winnerTeam);
         document.getElementById('winner-team').innerHTML = winnerTeam;
         window.stop();
     })
 }
 
+/**
+ * Obtiene al país anfitrion de la copa
+ * @param req
+ */
 function getHostCountry(req) {
     getEntities(req).then(data => {
         var hostCountry = data.entities[req]['labels']['es']['value'];
-        console.log('Pais Anfitrion: ' + hostCountry);
         document.getElementById('host-country').innerHTML = hostCountry;
     })
 }
 
+/**
+ * Obtiene goleador de la copa seleccionada
+ * @param req
+ */
 function getGoleador(req) {
     for (g in req) {
         var goleadorId = req[g]['mainsnak']['datavalue']['value']['id'];
         getGoalName(goleadorId);
     }
+}
+
+/**
+ * Obtiene los datos almacenados en bd a traves de la api en nodejs
+ * @param req
+ */
+function getCustomizedAnnotations(req) {
+
+    getEntitiesInDB(req).then(data => {
+        for (d in data) {
+
+            const annotationProperty = data[d]['annotationproperty'];
+            const annotationValue = data[d]['annotationvalue'];
+
+            addRow(annotationProperty, annotationValue);
+        }
+
+    })
+}
+
+async function getEntitiesInDB(req) {
+    let myRequest = new Request(`/api/entities/${req}/annotations`);
+    const response = await fetch(myRequest);
+    return await response.json();
 }
 
 /**
@@ -74,7 +116,6 @@ function getGoalName(req) {
     getEntities(req).then(data => {
         const ulLabels = document.getElementById("goleadores");
         var goleador = data.entities[req]['labels']['es']['value']
-        console.log('Goleador: ' + goleador);
         const liLabel = document.createElement("tr");
         const textLabel = document.createTextNode(goleador);
         liLabel.appendChild(textLabel);
@@ -83,16 +124,131 @@ function getGoalName(req) {
 
 }
 
-
+/**
+ * Guarda variables en la sessionStorage
+ * @param ent
+ * @param country
+ * @param year
+ */
 function pass(ent, country, year) {
-    console.log(ent, country, year);
     sessionStorage.setItem("entityCode", ent);
     sessionStorage.setItem("entityCountry", country);
     sessionStorage.setItem("entityYear", year);
 }
 
+/**
+ * Modifica la imagen segun la copa que se elija
+ */
 function loadImage() {
     var cdg = sessionStorage.getItem("entityCode");
     var cdgImg = '/images/' + cdg + '.jpg';
     $("img#Myimg").attr('src', cdgImg);
+}
+
+/**
+ * Guarda una nueva anotacion
+ */
+function saveAnnotation() {
+    const entityCode = sessionStorage.getItem("entityCode");
+    const annotationProperty = document.getElementById("_annotationProperty").value;
+    const annotationValue = document.getElementById("_annotationValue").value;
+    const data = {annotationProperty, annotationValue, entityCode};
+    addRow(annotationProperty, annotationValue);
+    const options = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    fetch('/api/entities/annotations', options);
+
+    return false;
+}
+
+/**
+ * Guarda los cambios en una anotacion
+ * @returns {boolean}
+ * @constructor
+ */
+function edAnnotation() {
+    const entityCode = sessionStorage.getItem("entityCode");
+    const annotationProperty = document.getElementById("idPropertyHolder").textContent;
+    const annotationValue = document.getElementById("idValueHolder").value;
+    const data = {annotationProperty, annotationValue, entityCode};
+    console.log(data);
+    const options = {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    fetch('/api/entities/annotations', options);
+    return false;
+}
+
+/**
+ * Elimina una anotacion
+ */
+function deleteAnnotation(annotationProperty) {
+    const entityCode = sessionStorage.getItem("entityCode");
+    console.log('deleting... ' + annotationProperty);
+    const options = {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    fetch(`/api/entities/${entityCode}/annotations/${annotationProperty}`, options);
+    window.alert('Anotación eliminada con éxito');
+    return false;
+}
+
+function addRow(annotationProperty, annotationValue) {
+
+
+    var tabla = document.getElementById('tblCustom');
+    const trCreate = document.createElement("tr");
+    const trLabel = document.createElement("td");
+    const textLabel = document.createTextNode(annotationProperty);
+    trLabel.appendChild(textLabel);
+    trCreate.appendChild(trLabel);
+
+    const trLabelV = document.createElement("td");
+    const textLabelV = document.createTextNode(annotationValue);
+    trLabelV.appendChild(textLabelV);
+    trCreate.appendChild(trLabelV);
+
+
+    // get the element you want to add the button to
+    const trButton = document.createElement("td");
+    // create the button object and add the text to it
+    var btnEdit = document.createElement("BUTTON");
+    btnEdit.innerHTML = "Editar";
+    btnEdit.onclick = function () {
+        $('#modalEdit').modal('show');
+        document.getElementById('idPropertyHolder').innerHTML = annotationProperty;
+        idValueHolder.value = annotationValue;
+       // document.getElementById('idValueHolder').innerHTML.val = annotationValue;
+    };
+
+    // add the button to the div
+    trButton.appendChild(btnEdit);
+    trCreate.appendChild(trButton);
+
+    // get the element you want to add the button to
+    const trButtonDel = document.createElement("tr");
+    // create the button object and add the text to it
+    var buttonDel = document.createElement("BUTTON");
+    buttonDel.innerHTML = "Eliminar";
+    buttonDel.onclick = function () {
+        deleteAnnotation(annotationProperty);
+    }
+
+    // add the button to the div
+    trButtonDel.appendChild(buttonDel);
+    trCreate.appendChild(trButtonDel);
+
+    tabla.appendChild(trCreate);
 }
