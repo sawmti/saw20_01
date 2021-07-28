@@ -13,6 +13,7 @@ app.use(express.static(root + '/client'));
 /************************/
 app.get('/api/entities/:entityCode', wikidata.getWikidataEntity);
 app.get('/api/entities', wikidata.getSparqlQuery);
+app.get('/api/entities-all-types/:entityCode', wikidata.getWikidataEntityAllTypes);
 /************************/
 
 /* POSTGRESQL RESOURCES */

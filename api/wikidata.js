@@ -1,10 +1,12 @@
 const newEngine = require('@comunica/actor-init-sparql').newEngine;
 const myEngine = newEngine();
+const request = require("request-promise");
+
 
 const getWikidataEntity = async (req, res) => {
     try {
-        var Request = require("request");
-        Request.get(`http://www.wikidata.org/entity/${req.params.entityCode}`, (error, response, body) => {
+        var request = require("request");
+        request.get(`http://www.wikidata.org/entity/${req.params.entityCode}`, (error, response, body) => {
             if (error) {
                 return console.dir(error);
             }
@@ -20,33 +22,54 @@ const getWikidataEntity = async (req, res) => {
     }
 };
 
+const getWikidataEntityAllTypes = async (req, res) => {
+    try {
+        var options = {
+            headers: {
+                'Accept': req.headers.accept
+            },
+            uri: `http://www.wikidata.org/entity/${req.params.entityCode}`,
+            method: 'GET'
+        }
+        var result = await request(options);
+        return  res.status(200).send(result);
+    } catch (err) {
+        console.log('error desconocido', err);
+        const error = {
+            msg: 'Error al listar'
+        }
+        console.log('error desconocido', err);
+        return res.status(500).json(error.msg);
+    }
+};
+
 
 const getSparqlQuery = async (req, res) => {
     try {
-      const results  = await data();
-      return res.status(200).json(results);
-  } catch (err) {
-      console.log('error desconocido', err);
-      const error = {
-          msg: 'Error al listar'
-      }
-      console.log('error desconocido', err);
-      return res.status(500).json(error.msg);
-  }
+        const results = await data();
+        return res.status(200).json(results);
+    } catch (err) {
+        console.log('error desconocido', err);
+        const error = {
+            msg: 'Error al listar'
+        }
+        console.log('error desconocido', err);
+        return res.status(500).json(error.msg);
+    }
 };
 
 class SPARQLQueryDispatcher {
-	constructor( endpoint ) {
-		this.endpoint = endpoint;
-	}
+    constructor(endpoint) {
+        this.endpoint = endpoint;
+    }
 
-	async query( sparqlQuery ) {
-		const fullUrl = this.endpoint + '?query=' + encodeURIComponent( sparqlQuery );
-		const headers = { 'Accept': 'application/sparql-results+json' };
+    async query(sparqlQuery) {
+        const fullUrl = this.endpoint + '?query=' + encodeURIComponent(sparqlQuery);
+        const headers = { 'Accept': 'application/sparql-results+json' };
 
-		const body = await fetch(fullUrl, { headers });
-    return await body.json();
-	}
+        const body = await fetch(fullUrl, { headers });
+        return await body.json();
+    }
 }
 
 const endpointUrl = 'https://query.wikidata.org/sparql';
@@ -61,12 +84,13 @@ WHERE
 } order by ?año`;
 
 const data = async () => {
-  const queryDispatcher = new SPARQLQueryDispatcher(endpointUrl);
-  const { results } = await queryDispatcher.query(sparqlQuery);
-  return results;
+    const queryDispatcher = new SPARQLQueryDispatcher(endpointUrl);
+    const { results } = await queryDispatcher.query(sparqlQuery);
+    return results;
 }
 
 module.exports = {
     getSparqlQuery,
     getWikidataEntity,
+    getWikidataEntityAllTypes,
 }
