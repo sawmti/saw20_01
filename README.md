@@ -6,6 +6,11 @@ This repository contains a simple skeleton of a web page which contains a REST s
 
 - [client](https://github.com/sawmti/saw20_0/tree/main/client) contains the source code of the web client (html/css/javascript files)
 - [api](https://github.com/sawmti/saw20_0/tree/main/api) contains the source code of the REST API
+
+## URL
+
+- https://try-saw.herokuapp.com/
+
 ## Running locally
 
 If you want to execute the project you will need 
